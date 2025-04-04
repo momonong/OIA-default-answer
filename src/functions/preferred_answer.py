@@ -9,7 +9,7 @@ def load_google_sheet():
     data = sheet.get_all_records()
     return data
 
-def get_preferred_answer(query, google_sheet, threshold=40):
+def get_preferred_answer(query, google_sheet=load_google_sheet(), threshold=40):
     best_match = None
     best_score = 0
     for record in google_sheet:

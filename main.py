@@ -3,21 +3,16 @@ import time
 import json
 from dotenv import load_dotenv
 from openai import AzureOpenAI
-from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
 from src.functions.preferred_answer import load_google_sheet, get_preferred_answer
 
 load_dotenv()
 
 # 初始化 Azure Assistant client
-token_provider = get_bearer_token_provider(
-    DefaultAzureCredential(),
-    "https://cognitiveservices.azure.com/.default"
-)
 client = AzureOpenAI(
-    azure_ad_token_provider=token_provider,
-    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-    api_version=os.getenv("AZURE_OPENAI_API_VERSION")
+    azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"),
+    api_key= os.getenv("AZURE_OPENAI_API_KEY"),
+    api_version="2024-05-01-preview"
 )
 
 # 建立 Assistant（只需執行一次）
