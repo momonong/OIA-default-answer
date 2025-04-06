@@ -30,7 +30,7 @@ if run.status == 'completed':
         thread_id=thread.id
     )
     print(messages)
-    elif run.status == 'requires_action':
+elif run.status == 'requires_action':
     # the assistant requires calling some functions
     # and submit the tool outputs back to the run
     pass
