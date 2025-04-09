@@ -12,7 +12,7 @@ def main():
     thread = client.beta.threads.create()
 
     # 模擬使用者提問
-    user_question = "申請復學的居留簽證的時候需要的復學證明可以什麼時候拿到?"
+    user_question = "復學證明可以什麼時候拿到?"
     client.beta.threads.messages.create(
         thread_id=thread.id, role="user", content=user_question
     )

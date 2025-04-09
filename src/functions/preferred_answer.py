@@ -12,10 +12,14 @@ def get_preferred_answer(query, google_sheet=load_google_sheet(), threshold=40):
     best_score = 0
     for record in google_sheet:
         candidate = record.get("問題", "")
-        score = fuzz.token_set_ratio(query, candidate)
+        score = fuzz.partial_ratio(query, candidate)
+        print(f"問題：{candidate}，分數：{score}")
         if score > best_score:
             best_score = score
             best_match = record
+            print(
+                f"問題：{candidate}，分數：{score}，最佳匹配：{best_match.get('問題', '')}"
+            )
     if best_score >= threshold:
         return best_match.get("回覆有誤", None)
     return None

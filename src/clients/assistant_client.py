@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from openai import AzureOpenAI
-from app.tool_registry import get_tool_definition, get_tool_resources
+from src.app.tool_registry import get_tool_definition, get_tool_resources
 
 
 def init_client():
