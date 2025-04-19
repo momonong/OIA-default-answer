@@ -174,3 +174,5 @@ cython_debug/
 .pypirc
 
 /keys
+/temp
+*.pkl

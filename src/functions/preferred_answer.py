@@ -1,33 +1,39 @@
-from rapidfuzz import fuzz
-from src.clients.sheet_client import init_google_sheet
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+from src.functions.embedding_cache import load_or_build_embedding_cache
+from src.clients.embedding_client import init_embedding_response
 
-def load_google_sheet():
-    sheet = init_google_sheet()
-    data = sheet.get_all_records()
-    return data
+def get_preferred_answer(query, threshold=0.6):
+    """
+    語意比對版本：根據 query 在 embedding 快取中找出最相近問題並回傳回答。
+    :param query: 使用者輸入的問題文字
+    :param threshold: 相似度門檻（0~1），預設為 0.6
+    :return: 相似度足夠則返回 AI 回覆，否則 None
+    """
+    data, vectors = load_or_build_embedding_cache()
+    vectors = np.array(vectors)
 
+    # 對 query 建立 embedding
+    response = init_embedding_response([query])
+    query_vec = np.array(response.data[0].embedding).reshape(1, -1)
 
-def get_preferred_answer(query, google_sheet=load_google_sheet(), threshold=40):
-    best_match = None
-    best_score = 0
-    for record in google_sheet:
-        candidate = record.get("問題", "")
-        score = fuzz.partial_ratio(query, candidate)
-        print(f"問題：{candidate}，分數：{score}")
-        if score > best_score:
-            best_score = score
-            best_match = record
-            print(
-                f"問題：{candidate}，分數：{score}，最佳匹配：{best_match.get('問題', '')}"
-            )
+    # 計算語意相似度
+    sims = cosine_similarity(query_vec, vectors)[0]
+    best_idx = np.argmax(sims)
+    best_score = sims[best_idx]
+    best_question = data[best_idx]["question"]
+    best_answer = data[best_idx]["answer"]
+
+    print(f"🧠 最相近問題：{best_question}")
+    print(f"📈 相似度：{best_score:.4f}")
+
     if best_score >= threshold:
-        return best_match.get("回覆有誤", None)
+        return best_answer
     return None
 
-
 if __name__ == "__main__":
-    # 測試模糊匹配
-    test_query = "申請復學的居留簽證的時候需要的復學證明可以什麼時候拿到?"
-    matched_answer = get_preferred_answer(test_query)
-    print("\n對於查詢：", test_query)
-    print("匹配到的預設回答：", matched_answer)
+    # 測試語意比對
+    query = "復學證明什麼時候可以拿到？"
+    answer = get_preferred_answer(query)
+    print(f"查詢問題：{query}")
+    print(f"推薦回答：{answer if answer else '查無匹配'}")
