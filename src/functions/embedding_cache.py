@@ -1,6 +1,6 @@
 import os
 import pickle
-from src.clients.embedding_client import init_embedding_response
+from src.clients.embedding_client import get_embedding_response
 from src.utils.google_sheet import load_google_sheet
 
 TEMP_DIR = "temp"
@@ -27,7 +27,7 @@ def load_or_build_embedding_cache():
         else:
             # 新資料 → 建立 embedding
             print(f"🔄 新增快取：Row {idx + 1} | 問題：{question[:15]}...")
-            response = init_embedding_response([question])
+            response = get_embedding_response([question])
             embedding = response.data[0].embedding
             cached = {"question": question, "answer": answer, "embedding": embedding}
             with open(cache_file, "wb") as f:

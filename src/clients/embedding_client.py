@@ -17,7 +17,7 @@ def init_client():
     return client
 
 
-def init_embedding_response(texts):
+def get_embedding_response(texts):
     """
     初始化嵌入響應
     """
@@ -29,6 +29,6 @@ def init_embedding_response(texts):
 if __name__ == "__main__":
     # 測試嵌入
     texts = ["這是一個測試", "這是另一個測試"]
-    response = init_embedding_response(texts)
+    response = get_embedding_response(texts)
     for text, embedding in zip(texts, response.data):
         print(f"文本：{text}，嵌入：{embedding.embedding}")

@@ -1,9 +1,10 @@
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from src.functions.embedding_cache import load_or_build_embedding_cache
-from src.clients.embedding_client import init_embedding_response
+from src.clients.embedding_client import get_embedding_response
+from src.functions.answer_verify import verify_answer_match
 
-def get_preferred_answer(query, threshold=0.6):
+def get_preferred_answer(query, threshold=0.7):
     """
     語意比對版本：根據 query 在 embedding 快取中找出最相近問題並回傳回答。
     :param query: 使用者輸入的問題文字
@@ -14,7 +15,7 @@ def get_preferred_answer(query, threshold=0.6):
     vectors = np.array(vectors)
 
     # 對 query 建立 embedding
-    response = init_embedding_response([query])
+    response = get_embedding_response([query])
     query_vec = np.array(response.data[0].embedding).reshape(1, -1)
 
     # 計算語意相似度
@@ -27,8 +28,13 @@ def get_preferred_answer(query, threshold=0.6):
     print(f"🧠 最相近問題：{best_question}")
     print(f"📈 相似度：{best_score:.4f}")
 
+    # 相似度門檻通過後 → 語意驗證
     if best_score >= threshold:
-        return best_answer
+        matched = verify_answer_match(query, best_answer)
+        print(f"🔍 驗證結果：{'✅ 有回到問題' if matched else '❌ 沒回到重點'}")
+        if matched:
+            return best_answer
+
     return None
 
 if __name__ == "__main__":
