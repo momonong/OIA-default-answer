@@ -2,6 +2,7 @@
 # Create a thread
 thread = client.beta.threads.create()
 
+
 # Add a user question to the thread
 message = client.beta.threads.messages.create(
     thread_id=thread.id,

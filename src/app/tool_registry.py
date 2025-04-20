@@ -22,6 +22,27 @@ def get_tool_definition():
                 },
             },
         },
+        {
+            "type": "function",
+            "function": {
+                "name": "get_answer_from_mongodb",
+                "description": "Based the identity of student and query the document from mongodb to get the answer",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "identity": {
+                            "type": "string",
+                            "description": "學生的身分，可以填入 international , chinese or oversea",
+                        },
+                        "query": {
+                            "type": "string",
+                            "description": "使用者提出的問題",
+                        }
+                    },
+                    "required": ["identity", "query"],
+                },
+            },
+        }
     ]
 
 
