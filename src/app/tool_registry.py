@@ -25,7 +25,7 @@ def get_tool_definition():
         {
             "type": "function",
             "function": {
-                "name": "get_answer_from_mongodb",
+                "name": "get_context_from_mongodb",
                 "description": "Based the identity of student and query the document from mongodb to get the answer",
                 "parameters": {
                     "type": "object",

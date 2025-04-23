@@ -68,12 +68,12 @@ class MongoDBRAG:
                     },
                     verbosity='executionStats'
                 )
-                print("Explain query results:", explain_query)  # Debug output
+                # print("Explain query results:", explain_query)  # Debug output
                 
                 # Try to extract execution time if available
                 if 'executionStats' in explain_query:
                     execution_time = explain_query['executionStats'].get('executionTimeMillis', 0)
-                    print(f"Query execution time: {execution_time} milliseconds")
+                    # print(f"Query execution time: {execution_time} milliseconds")
                 
             except Exception as stats_error:
                 print(f"Note: Could not get execution statistics: {stats_error}")
@@ -139,7 +139,7 @@ class MongoDBRAG:
         """
         query_embedding = self.get_embedding(query)  
         results = self.search_similar_documents(query_embedding, limit, identity)
-        
+        context = str(results[0])
         print("查詢:", query)
         print("\n搜尋結果:")
         if results:
@@ -154,9 +154,9 @@ class MongoDBRAG:
         print(f"找到 {len(results)} 個文件")
         
         if results:
-            response = self.get_chat_response(query, results[0], language)
-            print(response)
-            return {"results": results, "response": response}
+            # response = self.get_chat_response(query, results[0], language)
+            # print(context)
+            return {"results": results, "response": context}
         else:
             return {"results": [], "response": "未找到相關資訊"}
 

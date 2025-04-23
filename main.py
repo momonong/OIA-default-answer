@@ -12,7 +12,7 @@ def main():
     thread = client.beta.threads.create()
 
     # 模擬使用者提問
-    user_question = "復學證明什麼時候可以拿到?"
+    user_question = "我是僑生，新生體檢多少錢甚麼時候?"
     client.beta.threads.messages.create(
         thread_id=thread.id, role="user", content=user_question
     )
@@ -24,26 +24,28 @@ def main():
 
     # 等待 assistant 完成或進入 tool call 階段
     while run.status in ["queued", "in_progress"]:
+        print("in progress")
         time.sleep(1)
         run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
 
-    # Assistant 要求呼叫工具
-    if run.status == "requires_action":
-        tool_calls = run.required_action.submit_tool_outputs.tool_calls
-        tool_outputs = []
+        # Assistant 要求呼叫工具
+        if run.status == "requires_action":
+            print('required action')
+            tool_calls = run.required_action.submit_tool_outputs.tool_calls
+            tool_outputs = []
 
-        for call in tool_calls:
-            tool_outputs.append(handle_tool_call(call))
+            for call in tool_calls:
+                tool_outputs.append(handle_tool_call(call))
 
-        # 回傳工具執行結果
-        client.beta.threads.runs.submit_tool_outputs(
-            thread_id=thread.id, run_id=run.id, tool_outputs=tool_outputs
-        )
+            # 回傳工具執行結果
+            client.beta.threads.runs.submit_tool_outputs(
+                thread_id=thread.id, run_id=run.id, tool_outputs=tool_outputs
+            )
 
-        # 再次拉結果
-        time.sleep(1)
-        run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
-
+            # 再次拉結果
+            time.sleep(1)
+            run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+    print("tool end")
     # 最終取得回覆
     if run.status == "completed":
         messages = client.beta.threads.messages.list(thread_id=thread.id)
@@ -51,6 +53,7 @@ def main():
             if m.role == "assistant":
                 print("\n🤖 Assistant 回覆：")
                 print(m.content[0].text.value)
+    print(run.status)
 
 
 if __name__ == "__main__":
