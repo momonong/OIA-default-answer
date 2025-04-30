@@ -15,7 +15,7 @@ def load_or_build_embedding_cache():
 
     for idx, row in enumerate(sheet_data):
         question = row.get("問題", "")
-        answer = row.get("回覆有誤", "")
+        answer = row.get("回覆有誤（正確回答）", "")
         cache_file = os.path.join(TEMP_DIR, f"{idx}.pkl")
         if not question:
             print(f"⚠️ 跳過空白問題（Row {idx + 1}）")
