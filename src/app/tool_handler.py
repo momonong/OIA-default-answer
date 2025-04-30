@@ -22,7 +22,7 @@ def handle_tool_call(tool_call):
         print(f"Function name: {tool_call.function.name}")
         print(f"Function arguments: {args}")
         print(f"Function arguments type: {type(args)}")
-        answer = mongodb_rag.process_query(args["query"], 1,args["identity"])['results'][0]['content']
+        answer = mongodb_rag.process_query(args["query"], 1,args["identity"])
         print(f"Answer: {answer}")
         return {"tool_call_id": tool_call.id, "output": answer}
 

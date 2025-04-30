@@ -103,30 +103,8 @@ class MongoDBRAG:
         )
         return response.data[0].embedding
 
-    def get_chat_response(self, query, results, language) -> str:
-        """
-        Generate a chat response based on the query and search results
-        
-        Args:
-        query (str): User query
-        results: Search results to include in the prompt
-        
-        Returns:
-        str: Generated response from the model
-        """
-        response = self.chat_client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": '''You are a chatbot dedicated to answering user questions.
-                Use the following pieces of context to answer the question at the end. If you don't know the answer, 
-                just say that it is recommended to ask the International Office staff, don't try to make up an answer.'''},
-                {"role": "user", "content": f"Query: {query}\nResults: {results}"},
-                {"role": "system", "content": f"Do not use any formatting in your answer.\nAnswer in {language}:"}
-            ]
-        )
-        return response.choices[0].message.content
     
-    def process_query(self, query, limit=2, identity="international", language="English"):
+    def process_query(self, query, limit=2, identity="international")->str:
         """
         Process a user query end-to-end
         
@@ -135,11 +113,10 @@ class MongoDBRAG:
         limit (int): Maximum number of documents to retrieve
         
         Returns:
-        dict: Results containing search results and chat response
+        str: Results containing search results`
         """
         query_embedding = self.get_embedding(query)  
         results = self.search_similar_documents(query_embedding, limit, identity)
-        context = str(results[0])
         print("查詢:", query)
         print("\n搜尋結果:")
         if results:
@@ -154,12 +131,9 @@ class MongoDBRAG:
         print(f"找到 {len(results)} 個文件")
         
         if results:
-            # response = self.get_chat_response(query, results[0], language)
-            # print(context)
-            return {"results": results, "response": context}
+            return results[0]["content"]+"\n"+results[1]["content"]
         else:
-            return {"results": [], "response": "未找到相關資訊"}
-
+            return "未找到相關資訊"
 
 
 
@@ -167,7 +141,7 @@ def main():
     rag = MongoDBRAG()
     query = "選課網站是甚麼?"
     identity = "international"
-    rag.process_query(query, 2, identity, language="Traditional Chinese")
+    print(rag.process_query(query, 2, identity))
 
 
 if __name__ == "__main__":
