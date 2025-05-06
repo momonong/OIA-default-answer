@@ -15,6 +15,7 @@ def handle_tool_call(tool_call):
         answer = get_preferred_answer(args["query"])
         print(f"Answer: {answer}")
         return {"tool_call_id": tool_call.id, "output": answer or "查無匹配"}
+    
     elif tool_call.function.name == "get_context_from_mongodb":
         mongodb_rag = MongoDBRAG()
         args = json.loads(tool_call.function.arguments)  # ✅ 轉成 dict

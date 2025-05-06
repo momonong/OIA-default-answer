@@ -23,14 +23,16 @@ def main():
     )
 
     # 等待 assistant 完成或進入 tool call 階段
-    while run.status in ["queued", "in_progress"]:
-        print("in progress")
-        time.sleep(1)
+
+    while True:
         run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
 
-        # Assistant 要求呼叫工具
-        if run.status == "requires_action":
-            print('required action')
+        if run.status in ["queued", "in_progress"]:
+            print("in progress")
+            time.sleep(1)
+
+        elif run.status == "requires_action":
+            print("required action")
             tool_calls = run.required_action.submit_tool_outputs.tool_calls
             tool_outputs = []
 
@@ -41,19 +43,20 @@ def main():
             client.beta.threads.runs.submit_tool_outputs(
                 thread_id=thread.id, run_id=run.id, tool_outputs=tool_outputs
             )
-
-            # 再次拉結果
             time.sleep(1)
-            run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
-    print("tool end")
-    # 最終取得回覆
-    if run.status == "completed":
-        messages = client.beta.threads.messages.list(thread_id=thread.id)
-        for m in messages.data[::-1]:
-            if m.role == "assistant":
-                print("\n🤖 Assistant 回覆：")
-                print(m.content[0].text.value)
-    print(run.status)
+
+        elif run.status == "completed":
+            print("tool end")
+            messages = client.beta.threads.messages.list(thread_id=thread.id)
+            for m in messages.data[::-1]:
+                if m.role == "assistant":
+                    print("\n🤖 Assistant 回覆：")
+                    print(m.content[0].text.value)
+            break
+
+        else:
+            print(f"⚠️ Unexpected run status: {run.status}")
+            break
 
 
 if __name__ == "__main__":
