@@ -28,13 +28,14 @@ def get_model_response(question: str, answer: str):
         "請只回傳 'Yes' 或 'No'，不要包含其他文字。"
     )
 
-    user_prompt = f"""使用者問題：{question}
+    user_prompt = f"""
+        使用者問題：{question}
         機器人回答：{answer}
         請問這個回答是否有實質回應到問題？"""
 
     client = init_client()
     response = client.chat.completions.create(
-        model="gpt-4.1-mini",  # ← ✅ 這裡改成你有 quota 的模型
+        model="gpt-4.1-mini",  
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
